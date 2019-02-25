@@ -266,18 +266,17 @@ describe Instagram::API do
         end
 
         it "should redact API keys" do
-          ENV.stub(:[]).with('http_proxy').and_return(nil)
-          ENV.stub(:[]).with('INSTAGRAM_GEM_REDACT').and_return('true')
+          ClimateControl.modify('INSTAGRAM_GEM_REDACT' => 'true', 'http_proxy' => nil) do
+            output = capture_output do
+              @client.user_media_feed()
+            end
 
-          output = capture_output do
-            @client.user_media_feed()
+            expect(output).to include 'INFO -- : Started GET request to: https://api.instagram.com/v1/users/self/feed.json'
+            expect(output).to include 'DEBUG -- : Response Headers:'
+            expect(output).to include "User-Agent : Instagram Ruby Gem #{Instagram::VERSION}"
+            expect(output).to include 'http://distillery.s3.amazonaws.com/media/2011/01/31/0f8e832c3dc6420bb6ddf0bd09f032f6_6.jpg'
+            expect(output).to include 'access_token=[ACCESS-TOKEN]'
           end
-
-          expect(output).to include 'INFO -- : Started GET request to: https://api.instagram.com/v1/users/self/feed.json'
-          expect(output).to include 'DEBUG -- : Response Headers:'
-          expect(output).to include "User-Agent : Instagram Ruby Gem #{Instagram::VERSION}"
-          expect(output).to include 'http://distillery.s3.amazonaws.com/media/2011/01/31/0f8e832c3dc6420bb6ddf0bd09f032f6_6.jpg'
-          expect(output).to include 'access_token=[ACCESS-TOKEN]'
         end
       end
     end

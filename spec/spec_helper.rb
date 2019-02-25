@@ -14,6 +14,8 @@ require File.expand_path('../../lib/instagram', __FILE__)
 
 require 'rspec'
 require 'webmock/rspec'
+require 'climate_control'
+
 RSpec.configure do |config|
   config.include WebMock::API
 end
